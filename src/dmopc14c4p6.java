@@ -1,98 +1,72 @@
-import java.io.*;
 import java.util.*;
-public class dmopc14c2p6 {
-	static long freqTo(int idx) {
-		long sum = 0;
-		for(;idx>0;idx-=(idx&-idx)) {
-			sum += p[idx];
-		}
-		return sum;
-	}
-
-	static void update(int idx, long val) {
-		while (idx <= n) {
-			p[idx] += val;
-			idx += (idx & -idx);
-		}
-	}
-
-	static class query {
-		int a, b, q, pos;
-		long val;
-
-		public query(int a0, int b0, int q0, int pos0, long val0) {
-			a = a0;
-			b = b0;
-			q = q0;
-			pos = pos0;
-			val = val0;
-		}
-
-	}
-
-	static class QueryComparator implements Comparator<query> {
-		boolean byPos = false;
-
-		public int compare(query q1, query q2) {
-			if (byPos) {
-				return Integer.compare(q1.pos, q2.pos);
-			} else {
-				return Integer.compare(q2.q, q1.q);
-			}
-		}
-
-	}
-
-	static class p implements Comparable<p> {
-		int val, pos;
-
-		public p(int val0, int pos0) {
-			val = val0;
-			pos = pos0;
-		}
-
-		public int compareTo(p o) {
-			return o.val - val;
-		}
-	}
-
-	static int n;
-	static long[] p;
-	static p[] a;
-	static query[] q;
+import java.io.*;
+public class dmopc14c4p6 {
 
 	public static void main(String[] args) throws IOException {
-		n = readInt();
-		p = new long[100005];
-		a = new p[n];
-		for (int i = 0; i < n; i++) {
-			a[i] = new p(readInt(), i + 1);
+		int N = readInt();
+		ArrayList<Integer> adj[] = new ArrayList[N + 1];
+		
+		for(int i=1;i<N+1;i++) {
+			adj[i] = new ArrayList<Integer>();
 		}
-		int m = readInt();
-		q = new query[m];
-		for (int i = 0; i < m; i++) {
-			q[i] = new query(readInt() + 1, readInt() + 1, readInt(), i, 0);
+		
+		boolean vis[] = new boolean[N + 1];
+		int dis[] = new int[N + 1];
+		int dis2[] = new int[N + 1];
+		
+		for(int i=0;i<N-1;i++) {
+			int u = readInt();
+			int v = readInt();
+			adj[u].add(v); adj[v].add(u);
 		}
-		QueryComparator qc = new QueryComparator();
-		Arrays.sort(q, qc);
-		Arrays.sort(a);
-		int aPos = 0;
-		long[] ans = new long[m + 5];
-		for (int i = 0; i < m; i++) {
-			long queryVal = q[i].q;
-			for (int j = aPos; j < a.length; j++) {
-				if (queryVal <= a[j].val) {
-					update(a[j].pos, a[j].val);
-					aPos++;
-				} else {
-					break;
+		
+		int end = 0;
+		Queue<Integer> Q = new LinkedList<Integer>();
+		Q.add(1); vis[1] = true;
+		while(!Q.isEmpty()) {
+			int cur = Q.poll();
+			for(int v:adj[cur]) {
+				if(!vis[v]) {
+					Q.add(v);
+					vis[v] = true;
+					dis[v] = dis[cur] + 1;
+					end = v;
+				}	
+			}
+		}
+		
+		Arrays.fill(vis, false);
+		int end2 = 0;
+		Q.add(end); vis[end] = true; dis[end] = 0;
+		while(!Q.isEmpty()) {
+			int cur = Q.poll();
+			for(int v: adj[cur]) {
+				if(!vis[v]) {
+					Q.add(v);
+					vis[v] = true;
+					dis[v] = dis[cur] + 1;
+					end2 = v;
 				}
 			}
-			ans[q[i].pos] = freqTo(q[i].b) - freqTo(q[i].a - 1);
 		}
-		for (int i = 0; i < m; i++) {
-			System.out.println(ans[i]);
+		
+		Arrays.fill(vis, false);
+		Q.add(end2); vis[end2] = true; dis2[end2] = 0;
+		while(!Q.isEmpty()) {
+			int cur = Q.poll();
+			for(int v:adj[cur]) {
+				if(!vis[v]) {
+					Q.add(v);
+					vis[v] = true;
+					dis2[v] = dis2[cur] + 1;
+				}
+			}
 		}
+
+		for(int i=1;i <= N;i++) {
+			pr.println(Math.max(dis[i], dis2[i]) + 1);
+		}
+		pr.close();
 	}
 
 	final private static int BUFFER_SIZE = 1 << 16;
@@ -111,21 +85,19 @@ public class dmopc14c2p6 {
 		}
 		return new String(buf, 0, cnt);
 	}
-
-	public static String read() throws IOException {
+	public static String read() throws IOException{
 		byte[] ret = new byte[1024];
-		int idx = 0;
-		byte c = Read();
-		while (c <= ' ') {
-			c = Read();
-		}
-		do {
-			ret[idx++] = c;
-			c = Read();
-		} while (c != -1 && c != ' ' && c != '\n' && c != '\r');
-		return new String(ret, 0, idx);
+        int idx = 0;
+        byte c = Read();
+        while (c <= ' ') {
+            c = Read();
+        }
+        do {
+            ret[idx++] = c;
+            c = Read();
+        } while (c != -1 && c != ' ' && c != '\n' && c != '\r');
+        return new String(ret, 0, idx);
 	}
-
 	public static int readInt() throws IOException {
 		int ret = 0;
 		byte c = Read();
