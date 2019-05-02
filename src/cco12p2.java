@@ -1,9 +1,49 @@
 import java.util.*;
 import java.io.*;
 
-public class iotemplate {
+public class cco12p2 {
+	public static class p implements Comparable<p> {
+		int y, w;
+		public p(int y1, int w1) {
+			y = y1; w = w1;
+		}
+		public int compareTo(p z) {
+			return Integer.compare(w, z.w);
+		}
+	}
 
 	public static void main(String[] args) throws IOException {
+		int N = readInt(), M = readInt();
+		ArrayList<p> adj[] = new ArrayList[N+1];
+		int dis[] = new int[N+1], dis2[] = new int[N+1];
+		for(int i=1;i<=N;i++) {
+			adj[i] = new ArrayList<p>();
+			dis[i] = Integer.MAX_VALUE;
+			dis2[i] = Integer.MAX_VALUE;
+		}
+		for(int i=0;i<M;i++) {
+			int a = readInt(), b = readInt(), w = readInt();
+			adj[a].add(new p(b, w));
+			//adj[b].add(new p(a, w));
+		}
+		PriorityQueue<p> pq = new PriorityQueue<p>();
+		dis[1] = 0;
+		pq.add(new p(1,0));
+		while(!pq.isEmpty()) {
+			p cur = pq.poll();
+			for(p z: adj[cur.y]) {
+				if(cur.w + z.w < dis[z.y]) {
+					dis2[z.y] = dis[z.y]; 
+					dis[z.y] = cur.w + z.w;
+					pq.add(new p(z.y, dis[z.y]));
+				} else if(cur.w + z.w != dis[z.y] && cur.w + z.w < dis2[z.y]) {
+					dis2[z.y] = cur.w + z.w;
+					pq.add(new p(z.y, dis2[z.y]));
+				}
+			}
+		}
+		// for(int i=1;i<=N;i++) System.out.println(dis[i]);
+		pr.println(dis2[N]==Integer.MAX_VALUE?-1:dis2[N]);
 		pr.close();
 	}
 
