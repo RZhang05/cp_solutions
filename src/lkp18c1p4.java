@@ -1,122 +1,30 @@
 import java.util.*;
 import java.io.*;
-public class utso15p5 {
+public class lkp18c1p4 {
 	
-	static class edge implements Comparable<edge>{
-		int u, v, w;
-		edge(int u1, int v1, int w1) {
-			u = u1; v = v1; w = w1;
+	static class E implements Comparable<E> {
+		int v, w;
+		E(int v1, int w1) {
+			v = v1; w = w1;
 		}
-		public int compareTo(edge z) {
+		public int compareTo(E z) {
 			return Integer.compare(w, z.w);
 		}
 	}
 	
-	static class p {
-		int f, s;
-		p(int f1, int s1) {
-			f = f1; s = s1;
-		}
-	}
-	
-	static final int MM = 50002, K = 16, INF = Integer.MAX_VALUE;
-	static int N, M, p[] = new int[MM], lca[][] = new int[K][MM], val[][] = new int[K][MM], dep[] = new int[MM], mst, ans = INF, cnt = 0;
-	static boolean vis[] = new boolean[100003];
-	static edge[] e = new edge[100003];
-	static ArrayList<p> adj[] = new ArrayList[MM];
-	
-	static int fd(int d) {
-		if(d==p[d]) return p[d];
-		return p[d] = fd(p[d]);
-	}
-	
-	static void kruskal() {
-		Arrays.sort(e);
-		for(int i=0;i<M;i++) {
-			int fu = fd(e[i].u), fv = fd(e[i].v);
-			if(fu != fv) {
-				p[fu] = fv; cnt++; vis[i]=true;mst+=e[i].w;
-				adj[e[i].u].add(new p(e[i].v,e[i].w));
-			}
-			if(cnt == N-1) return;
-		}
-	}
-	
-	static void dfs(int u, int pa) {
-		for(p t: adj[u]) {
-			if(t.f == pa) continue;
-			dep[t.f] = dep[u]+1; lca[0][t.f]=u; val[0][t.f]=t.s; dfs(t.f, u);
-		}
-	}
-	
-	static void build() {
-		for(int i=1;i<K;i++) {
-			for(int j=1;j<=N;j++) {
-				if(lca[i][j] != -1) {
-					lca[i][j] = lca[i-1][lca[i-1][j]]; val[i][j] = Math.max(val[i-1][j], val[i-1][lca[i-1][j]]);
-				}
-			}
-		}
-	}
-	
-	static int getLCA(int u, int v) {
-		if(dep[u] < dep[v]) {
-			int t = dep[u];
-			dep[u] = dep[v];
-			dep[v] = t;
-		}
-		for(int i=K-1;i>=0;i--) {
-			if(lca[i][u] != -1 && dep[lca[i][u]] >= dep[v]) u = lca[i][u];
-		}
-		if(u==v) return v;
-		for(int i=K-1;i>=0;i--) {
-			if(lca[i][u]!=-1 && lca[i][v] != -1 && lca[i][u] != lca[i][v]) {
-				u = lca[i][u]; v = lca[i][v];
-			}
-		}
-		return lca[0][u];
-	}
-	
-	static int query(int u, int rt) {
-		int ret = 0;
-		for(int i=K-1;i>=0;i--) {
-			if(dep[u] >= dep[rt] + (1<<i)) {
-				ret = Math.max(ret, val[i][u]); u = lca[i][u];
-			}
-		}
-		return ret;
-	}
-	
-	static void solve() {
-		if(cnt != N-1) {
-			pr.println(-1);
-			return;
-		}
-		for(int i=0;i<K;i++) {
-			for(int j=0;j<MM;j++) {
-				lca[i][j] = -1;
-				val[i][j] = -1;
-			}
-		}		
-		dfs(1,0); build();
-		for(int i=0;i<M;i++) {
-			if(vis[i]) continue;
-			int rt = getLCA(e[i].u, e[i].v), maxCost = Math.max(query(e[i].u, rt), rt);
-			int sec = mst + e[i].w - maxCost;
-			if(sec != mst && sec < ans) ans = sec;
-		}
-		pr.println(ans==INF?-1:ans);
-	}
+	static final int MAXN = 100005;
 
 	public static void main(String[] args) throws IOException {
 		int N = readInt(), M = readInt();
-		for(int i=0;i<100003;i++) e[i] = new edge(0,0,Integer.MAX_VALUE);
+		ArrayList<E> adj[] = new ArrayList[N+1];
+		for(int i=0;i<=N;i++) adj[i] = new ArrayList<E>();
 		for(int i=0;i<M;i++) {
-			e[i] = new edge(readInt(), readInt(), readInt());
+			int a = readInt(), b = readInt(), c = readInt();
+			adj[a].add(new E(b, c));
+			adj[b].add(new E(a, c));
 		}
-		for(int i=1;i<=N;i++) p[i] = i;
-		kruskal(); solve();
-		pr.close();
+		PriorityQueue<E> pq = new PriorityQueue<E>();
+		boolean vis[] = new boolean[N+1];
 	}
 
 	final private static int BUFFER_SIZE = 1 << 16;
